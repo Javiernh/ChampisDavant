@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Champis d'avant
-// @version  1.1
+// @version  1.1.1
 // @match    http://mush.vg/*
 // @match    http://mush.twinoid.com/*
 // @match    http://mush.twinoid.es/*
@@ -182,7 +182,7 @@ function analyseProfiles(me, them, block, friendId, friendName, forceWoman) {
 			inList = true;
 		}
 	}
-	if (!inList) { //Add
+	if (!inList && friendId != /[0-9]+/.exec(sel('#tid_openRight').getAttribute('href'))[0]) { //Add if it's not yourself
 		friends.push([friendId, friendName, corrs].join(':'));
 	}
 	localStorage['ChampisDavant-friends-' + lang] = friends.join(';');
@@ -276,10 +276,6 @@ setInterval(function() {
 		}
 		var popup = minorLinks.parentNode.parentNode;
 		var id = /[0-9]+/.exec(sel('.tid_majorLinks a[href*="user/"]', popup).getAttribute('href'))[0];
-		var myId = /[0-9]+/.exec(sel('#tid_openRight').getAttribute('href'))[0];
-		if (id == myId) {
-			return;
-		}
 		var woman = sel('[src$="icons/female.png"]', popup);
 		var link = addNewEl('a', minorLinks, null, TXT.popup + (woman ? TXT.popupFemale : TXT.popupMale), { href: '#', onclick: 'return false;' });
 		link.addEventListener('click', function() {
