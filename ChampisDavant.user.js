@@ -80,26 +80,26 @@ if (document.domain == 'mush.vg') {
 else if (document.domain == 'mush.twinoid.es') {
 	lang = 'es';
 	TXT = {
-		shipsTogether: "Mushes Reunited: Ships together",
-		analysis: "Start analysis",
-		youPlayed: "You played…",
-		hePlayed: "They played…",
-		shePlayed: "They played…",
-		days: "Days",
-		ship: "Ship",
-		shipLink: "Honours List",
-		resultsNumber: "You played %1 ships together.",
+		shipsTogether: "Mushes Reunidos: Naves juntos",
+		analysis: "Comenzar análisis",
+		youPlayed: "Tú jugaste…",
+		hePlayed: "Él jugó…",
+		shePlayed: "Ella jugó…",
+		days: "Días",
+		ship: "Nave",
+		shipLink: "Fama",
+		resultsNumber: "Ambos jugasteis %1 naves juntos.",
 
-		peopleMet: "Mushes Reunited: People met ingame",
-		pseudo: "Pseudo",
-		shipsNumber: "Ships",
-		noFriend: "No data available. Go on someone's Mush profile and start a mutual ships analysis.",
+		peopleMet: "Mushes Reunidos: Gente encontrada en el juego",
+		pseudo: "Nick",
+		shipsNumber: "Naves",
+		noFriend: "Sin datos disponibles. Entra en el perfil de Mush de alguien y comienza el análisis.",
 
-		popup: "Mushes Reunited : ships with ",
-		popupMale: "this player",
-		popupFemale: "this player",
-		popupTitle: "Games played with %1",
-	}
+		popup: "Mushes Reunidos : naves con ",
+		popupMale: "este jugador",
+		popupFemale: "esta jugadora",
+		popupTitle: "Partidas jugadas con %1",
+	};
 }
 else {
 	lang = 'en';
