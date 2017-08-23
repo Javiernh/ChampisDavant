@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Champis d'avant
-// @version  1.1.1
+// @version  1.2
 // @match    http://mush.vg/*
 // @match    http://mush.twinoid.com/*
 // @match    http://mush.twinoid.es/*
@@ -42,7 +42,7 @@ function addNewEl(type, parent, id, content, attrs) {
 		{ var el = document.createElement(type); }
 	if (id) { el.id = id; }
 	if (content) { el.innerHTML = content; }
-	if (attrs) { for (i in attrs) { el.setAttribute(i, attrs[i]); } }
+	if (attrs) { for (attr in attrs) { el.setAttribute(attr, attrs[attr]); } }
 	if (parent) { parent.appendChild(el); }
 	return el;
 }
@@ -54,15 +54,17 @@ if (document.domain == 'mush.vg') {
 	lang = 'fr';
 	TXT = {
 		//Friend's profile
-		shipsTogether: "Champis d'avant : Vaisseaux ensemble",
+		shipsTogether: "Champis d'avant : Vaisseaux en commun",
 		analysis: "Lancer l'analyse",
 		youPlayed: "Vous jouiez…",
 		hePlayed: "Il jouait…",
 		shePlayed: "Elle jouait…",
+		theyPlayed: "Il/Elle jouait…",
 		days: "Jours",
 		ship: "Vaisseau",
 		shipLink: "Palmarès",
-		resultsNumber: "Vous avez fait %1 vaisseaux ensemble.",
+		resultsNumberSingular: "Vous avez fait %1 vaisseau ensemble.",
+		resultsNumberPlural: "Vous avez fait %1 vaisseaux ensemble.",
 
 		//Own profile
 		peopleMet: "Champis d'avant : Personnes croisées en partie",
@@ -72,8 +74,6 @@ if (document.domain == 'mush.vg') {
 
 		//Popup
 		popup: "Champis d'avant : parties avec ",
-		popupMale: "ce joueur",
-		popupFemale: "cette joueuse",
 		popupTitle: "Parties jouées avec %1",
 	}
 }
@@ -83,12 +83,14 @@ else if (document.domain == 'mush.twinoid.es') {
 		shipsTogether: "Mushes Reunited: Ships together",
 		analysis: "Start analysis",
 		youPlayed: "You played…",
-		hePlayed: "They played…",
-		shePlayed: "They played…",
+		hePlayed: "He played…",
+		shePlayed: "She played…",
+		theyPlayed: "They played…",
 		days: "Days",
 		ship: "Ship",
 		shipLink: "Honours List",
-		resultsNumber: "You played %1 ships together.",
+		resultsNumberSingular: "You played %1 ship together.",
+		resultsNumberPlural: "You played %1 ships together.",
 
 		peopleMet: "Mushes Reunited: People met ingame",
 		pseudo: "Pseudo",
@@ -96,8 +98,6 @@ else if (document.domain == 'mush.twinoid.es') {
 		noFriend: "No data available. Go on someone's Mush profile and start a mutual ships analysis.",
 
 		popup: "Mushes Reunited : ships with ",
-		popupMale: "this player",
-		popupFemale: "this player",
 		popupTitle: "Games played with %1",
 	}
 }
@@ -107,12 +107,14 @@ else {
 		shipsTogether: "Mushes Reunited: Ships together",
 		analysis: "Start analysis",
 		youPlayed: "You played…",
-		hePlayed: "They played…",
-		shePlayed: "They played…",
+		hePlayed: "He played…",
+		shePlayed: "She played…",
+		theyPlayed: "They played…",
 		days: "Days",
 		ship: "Ship",
 		shipLink: "Honours List",
-		resultsNumber: "You played %1 ships together.",
+		resultsNumberSingular: "You played %1 ship together.",
+		resultsNumberPlural: "You played %1 ships together.",
 
 		peopleMet: "Mushes Reunited: People met ingame",
 		pseudo: "Pseudo",
@@ -120,51 +122,11 @@ else {
 		noFriend: "No data available. Go on someone's Mush profile and start a mutual ships analysis.",
 
 		popup: "Mushes Reunited : ships with ",
-		popupMale: "this player",
-		popupFemale: "this player",
 		popupTitle: "Games played with %1",
 	}
 }
 
-function analyseProfiles(me, them, block, friendId, friendName, forceWoman) {
-	var trShipsB = selAll('.cdTripEntry', them); //Their ships
-	var trShipsA = selAll('.cdTripEntry', me); //Our ships
-	var corrs = 0;
-	var corrsResult = addNewEl('h4', block);
-	corrsResult.style.textAlign = 'center';
-
-	var table = addNewEl('table', block);
-	table.className = 'summar';
-	var thead = addNewEl('tr', table);
-	addNewEl('th', thead, null, TXT.youPlayed, { colspan: 2 });
-	addNewEl('th', thead, null, (sel('[src$="icons/female.png"]') || forceWoman ? TXT.shePlayed : TXT.hePlayed), { colspan: 2 });
-	addNewEl('th', thead, null, TXT.days);
-	addNewEl('th', thead, null, TXT.ship);
-
-	var shipsA = {}
-	for (var i = 0; i < trShipsA.length; i++) {
-		var id = /[0-9]+/.exec(sel('.butmini', trShipsA[i]).getAttribute('href'));
-		shipsA[id] = [trShipsA[i].children[0].innerHTML, trShipsA[i].children[8].textContent, trShipsA[i].children[1].textContent]; //Charname, death, days
-	}
-	for (var i = 0; i < trShipsB.length; i++) {
-		var id = /[0-9]+/.exec(sel('.butmini', trShipsB[i]).getAttribute('href'));
-		if (id in shipsA) {
-			corrs++;
-			var tr = addNewEl('tr', table);
-			addNewEl('td', tr, null, shipsA[id][0]);
-			addNewEl('td', tr, null, shipsA[id][1]);
-			addNewEl('td', tr, null, trShipsB[i].children[0].innerHTML);
-			addNewEl('td', tr, null, trShipsB[i].children[8].textContent);
-			addNewEl('td', tr, null, shipsA[id][2]);
-			addNewEl('td', tr, null, '<a href="/theEnd/' + id + '" class="butmini" target="_blank"><img src="/img/icons/ui/pageright.png"> ' + TXT.shipLink + '</a>');
-		}
-	}
-
-	corrsResult.textContent = TXT.resultsNumber.replace('%1', corrs);
-	if (corrs == 0) {
-		block.removeChild(table);
-	}
-
+function updateStorage(friendId, friendName, corrs, remove=false) {
 	var inList = false;
 	var friends = localStorage['ChampisDavant-friends-' + lang];
 	if (friends == undefined) {
@@ -178,14 +140,211 @@ function analyseProfiles(me, them, block, friendId, friendName, forceWoman) {
 		}
 		var friend = friends[i].split(':');
 		if (friend[0] == friendId) { //Update
-			friends[i] = [friendId, friendName, corrs].join(':');
-			inList = true;
+			if (remove) {
+				friends.splice(i, 1);
+				inList = true;
+			}
+			else {
+				friends[i] = [friendId, friendName, corrs].join(':');
+				inList = true;
+			}
 		}
 	}
 	if (!inList && friendId != /[0-9]+/.exec(sel('#tid_openRight').getAttribute('href'))[0]) { //Add if it's not yourself
 		friends.push([friendId, friendName, corrs].join(':'));
 	}
 	localStorage['ChampisDavant-friends-' + lang] = friends.join(';');
+}
+
+
+function analyseProfiles(me, them, block, friendId, friendName, forceWoman, forceMan) {
+	var trShipsB = selAll('.cdTripEntry', them); //Their ships
+	var trShipsA = selAll('.cdTripEntry', me); //Our ships
+	var corrs = 0;
+	var corrsResult = addNewEl('h4', block);
+	corrsResult.style.textAlign = 'center';
+
+	var gender = TXT.theyPlayed;
+	if (sel('[src$="icons/female.png"]') || forceWoman) {
+		gender = TXT.shePlayed;
+	}
+	else if (sel('[src$="icons/male.png"]') || forceMan) {
+		gender = TXT.hePlayed;
+	}
+
+	var table = addNewEl('table', block);
+	table.className = 'summar';
+	var thead = addNewEl('tr', table);
+	addNewEl('th', thead, null, TXT.youPlayed, { colspan: 2 });
+	addNewEl('th', thead, null, gender, { colspan: 2 });
+	addNewEl('th', thead, null, TXT.days);
+	addNewEl('th', thead, null, TXT.ship);
+
+	var shipsA = {}
+	for (var i = 0; i < trShipsA.length; i++) {
+		var id = /[0-9]+/.exec(sel('.butmini', trShipsA[i]).getAttribute('href'))[0];
+		shipsA[id] = [trShipsA[i].children[0].innerHTML, trShipsA[i].children[8].textContent, trShipsA[i].children[1].textContent]; //Charname, death, days
+	}
+	for (var i = 0; i < trShipsB.length; i++) {
+		var id = /[0-9]+/.exec(sel('.butmini', trShipsB[i]).getAttribute('href'))[0];
+		if (id in shipsA) {
+			corrs++;
+			var tr = addNewEl('tr', table);
+			addNewEl('td', tr, null, shipsA[id][0]);
+			addNewEl('td', tr, null, shipsA[id][1]);
+			addNewEl('td', tr, null, trShipsB[i].children[0].innerHTML);
+			addNewEl('td', tr, null, trShipsB[i].children[8].textContent);
+			addNewEl('td', tr, null, shipsA[id][2]);
+			addNewEl('td', tr, null, '<a href="/theEnd/' + id + '" class="butmini" target="_blank"><img src="/img/icons/ui/pageright.png"> ' + TXT.shipLink + '</a>');
+		}
+	}
+
+	if (corrs == 1) {
+		corrsResult.textContent = TXT.resultsNumberSingular.replace('%1', corrs);
+	}
+	else {
+		corrsResult.textContent = TXT.resultsNumberPlural.replace('%1', corrs);
+	}
+	if (corrs == 0) {
+		block.removeChild(table);
+	}
+
+	updateStorage(friendId, friendName, corrs);
+}
+
+
+function updateFriend(img, friendId) {
+	GM_xmlhttpRequest({
+		method: 'GET', url: 'http://' + document.domain + '/u/profile/' + friendId,
+		onload: function(content) {
+			var them = addNewEl('div', document.body, null, content.responseText.replace('cdTrips', 'CDA-cdTrips'));
+			them.style.display = 'none';
+			if (!sel('.cdTripEntry', them)) {
+				document.body.removeChild(them);
+				img.setAttribute('src', '/img/icons/ui/broken.png');
+				return false;
+			}
+			var name = sel('title', them).textContent;
+			switch (lang) {
+				case 'fr':
+					name = /Profil de (\S+)/.exec(name)[1];
+					break;
+				case 'es':
+					name = /Perfil de (\S+)/.exec(name)[1];
+					break;
+				case 'en':
+				default:
+					name = /(\S+)'s Profile/.exec(name)[1];
+			}
+			
+			var trShipsB = selAll('.cdTripEntry', them); //Their ships
+			var trShipsA = selAll('.cdTripEntry', sel('#cdTrips')); //Our ships
+			var corrs = 0;
+			var shipsA = [];
+			var id;
+			for (var i = 0; i < trShipsA.length; i++) {
+				id = /[0-9]+/.exec(sel('.butmini', trShipsA[i]).getAttribute('href'))[0];
+				shipsA.push(id);
+			}
+			for (var j = 0; j < trShipsB.length; j++) {
+				id = /[0-9]+/.exec(sel('.butmini', trShipsB[j]).getAttribute('href'))[0];
+				if (shipsA.indexOf(id) != -1) {
+					corrs++;
+				}
+			}
+			updateStorage(friendId, name, corrs);
+			doOwnProfile();
+			document.body.removeChild(them);
+			img.setAttribute('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAB7BAAAewQHDaVRTAAAAB3RJTUUH3wQPAAkQTioZ4QAAARZJREFUKM910qFKRFEQxvHfXDcIgtoMt5gMBhGfwGYWzGJ1n0CwKvgAos1gMFmMBt/CZLJssKmwsEE5BufI4bIOHA73zvznY745gd5vfBlEKeXNPzHCMq6xOsjtRcQaLvCBK0xLKRPo8IljvA/A9Txb2MUtdiKihy47fGNxAL7muccs86dYgi47jDMxa5VzxlscNvA4Ivoua7bzfsJZwqOEJ5jioa0NrOGxGlKBBgJp1F/daM4KJv9sYKX96FKhznVUXasqEXGXavv5+x2jOuNz3vtYamFs4rIBnyFKKSJiI92rzj7gJgsfmyYzHJZSXqriFOeN5QfNAzAAFyKij1JKnafP5Y7TiJM5inXG4z9wXqQp8963H0CpVRH+JJ0LAAAAAElFTkSuQmCC');
+		}
+	});
+}
+
+
+function doOwnProfile() {
+	block = sel('#CDA-owntable');
+	block.innerHTML = '';
+	addNewEl('h3', block, null, TXT.peopleMet);
+	var table = addNewEl('table', block);
+	table.className = 'summar';
+	table.style.width = '95%';
+	var thead = addNewEl('tr', table);
+	addNewEl('th', thead, null, TXT.pseudo);
+	addNewEl('th', thead, null, TXT.shipsNumber).className = 'ChampisDavantTD';
+	addNewEl('th', thead, null, TXT.pseudo);
+	addNewEl('th', thead, null, TXT.shipsNumber);
+
+	var tr;
+	var newLine = true;
+	var friends = localStorage['ChampisDavant-friends-' + lang];
+	if (friends == undefined) {
+		friends = '';
+		addNewEl('tr', table, null, '<td colspan="4">' + TXT.noFriend + '</td>');
+		return;
+	}
+	friends = friends.split(';');
+	friends.sort(function(a, b) {
+		//Beware: top to bottom!
+		if (parseInt(a.split(':')[2]) > parseInt(b.split(':')[2])) {
+			return -1;
+		}
+		else {
+			return 1;
+		}
+	});
+
+	var half = Math.ceil(friends.length / 2);
+	var friendsA = friends.slice(0, half);
+	var friendsB = friends.slice(half);
+
+	for (var i = 0; i < half; i++) {
+		(function() {
+			var friendA = friendsA[i].split(':');
+			tr = addNewEl('tr', table);
+			var a = addNewEl('td', tr, null, '<a href="/u/profile/' + friendA[0] + '" target="_blank">' + friendA[1] + '</a>');
+			var b = addNewEl('td', tr, null, friendA[2], { style: 'position: relative;' });
+			b.className = 'ChampisDavantTD';
+			addNewEl('img', a, null, null, {
+				style: 'margin-left: 6px; cursor: pointer;',
+				src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAB7BAAAewQHDaVRTAAAAB3RJTUUH3wQPAAkQTioZ4QAAARZJREFUKM910qFKRFEQxvHfXDcIgtoMt5gMBhGfwGYWzGJ1n0CwKvgAos1gMFmMBt/CZLJssKmwsEE5BufI4bIOHA73zvznY745gd5vfBlEKeXNPzHCMq6xOsjtRcQaLvCBK0xLKRPo8IljvA/A9Txb2MUtdiKihy47fGNxAL7muccs86dYgi47jDMxa5VzxlscNvA4Ivoua7bzfsJZwqOEJ5jioa0NrOGxGlKBBgJp1F/daM4KJv9sYKX96FKhznVUXasqEXGXavv5+x2jOuNz3vtYamFs4rIBnyFKKSJiI92rzj7gJgsfmyYzHJZSXqriFOeN5QfNAzAAFyKij1JKnafP5Y7TiJM5inXG4z9wXqQp8963H0CpVRH+JJ0LAAAAAElFTkSuQmCC'
+			}).addEventListener('click', function() {
+				this.setAttribute('src', '/img/icons/ui/loading1.gif');
+				updateFriend(this, friendA[0]);
+			});
+			addNewEl('img', b, null, null, {
+				style: 'position: absolute; top: 4px; right: 4px; cursor: pointer;',
+				src: '/img/icons/ui/close.png'
+			}).addEventListener('click', function() {
+				updateStorage(friendA[0], null, null, true);
+				doOwnProfile();
+			});
+
+			var friendB = friendsB[i];
+			if (friendB) {
+				friendB = friendB.split(':');
+				var c = addNewEl('td', tr, null, '<a href="/u/profile/' + friendB[0] + '" target="_blank">' + friendB[1] + '</a>');
+				var d = addNewEl('td', tr, null, friendB[2], { style: 'position: relative;' });
+				addNewEl('img', c, null, null, {
+					style: 'margin-left: 6px; cursor: pointer;',
+					src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAB7BAAAewQHDaVRTAAAAB3RJTUUH3wQPAAkQTioZ4QAAARZJREFUKM910qFKRFEQxvHfXDcIgtoMt5gMBhGfwGYWzGJ1n0CwKvgAos1gMFmMBt/CZLJssKmwsEE5BufI4bIOHA73zvznY745gd5vfBlEKeXNPzHCMq6xOsjtRcQaLvCBK0xLKRPo8IljvA/A9Txb2MUtdiKihy47fGNxAL7muccs86dYgi47jDMxa5VzxlscNvA4Ivoua7bzfsJZwqOEJ5jioa0NrOGxGlKBBgJp1F/daM4KJv9sYKX96FKhznVUXasqEXGXavv5+x2jOuNz3vtYamFs4rIBnyFKKSJiI92rzj7gJgsfmyYzHJZSXqriFOeN5QfNAzAAFyKij1JKnafP5Y7TiJM5inXG4z9wXqQp8963H0CpVRH+JJ0LAAAAAElFTkSuQmCC'
+				}).addEventListener('click', function() {
+					this.setAttribute('src', '/img/icons/ui/loading1.gif');
+					updateFriend(this, friendB[0]);
+				});
+				addNewEl('img', d, null, null, {
+					style: 'position: absolute; top: 4px; right: 4px; cursor: pointer;',
+					src: '/img/icons/ui/close.png'
+				}).addEventListener('click', function() {
+					updateStorage(friendB[0], null, null, true);
+					doOwnProfile();
+				});
+			}
+			else { //After last profile with odd number of friends
+				addNewEl('td', tr, null, '');
+				addNewEl('td', tr, null, '');
+			}
+		})();
+	}
 }
 
 
@@ -217,53 +376,8 @@ if (/profile\/[0-9]+/.test(document.location)) {
 //Own profile
 else if (/\/me/.test(document.location)) {
 	addNewEl('style', document.head, null, '.ChampisDavantTD { border-right: 1px dotted rgba(0, 0, 0, 0.5); }');
-	var block = addNewEl('div', addNewEl('div', sel('.data'), null, null, { class: 'bgtablesummar' }));
-	block.className = 'twinstyle';
-	addNewEl('h3', block, null, TXT.peopleMet);
-	var table = addNewEl('table', block);
-	table.className = 'summar';
-	table.style.width = '95%';
-	var thead = addNewEl('tr', table);
-	addNewEl('th', thead, null, TXT.pseudo);
-	addNewEl('th', thead, null, TXT.shipsNumber).className = 'ChampisDavantTD';
-	addNewEl('th', thead, null, TXT.pseudo);
-	addNewEl('th', thead, null, TXT.shipsNumber);
-
-	var tr;
-	var newLine = true;
-	var friends = localStorage['ChampisDavant-friends-' + lang];
-	if (friends == undefined) {
-		friends = '';
-		addNewEl('tr', table, null, '<td colspan="4">' + TXT.noFriend + '</td>');
-		return;
-	}
-	friends = friends.split(';');
-	friends.sort(function(a, b) {
-		//Beware: top to bottom!
-		if (parseInt(a.split(':')[2]) > parseInt(b.split(':')[2])) {
-			return -1;
-		}
-		else {
-			return 1;
-		}
-	});
-	for (var i = 0; i < friends.length; i++) {
-		if (!friends[i]) {
-			continue;
-		}
-		var friend = friends[i].split(':');
-		if (newLine) {
-			tr = addNewEl('tr', table);
-			addNewEl('td', tr, null, '<a href="/u/profile/' + friend[0] + '" target="_blank">' + friend[1] + '</a>');
-			addNewEl('td', tr, null, friend[2]).className = 'ChampisDavantTD';
-			newLine = false;
-		}
-		else {
-			addNewEl('td', tr, null, '<a href="/u/profile/' + friend[0] + '" target="_blank">' + friend[1] + '</a>');
-			addNewEl('td', tr, null, friend[2]);
-			newLine = true;
-		}
-	}
+	var block = addNewEl('div', addNewEl('div', sel('.data'), 'CDA-owntable', null, { class: 'bgtablesummar twinstyle' }));
+	doOwnProfile();
 }
 
 //Pseudo popups analysis
@@ -277,7 +391,8 @@ setInterval(function() {
 		var popup = minorLinks.parentNode.parentNode;
 		var id = /[0-9]+/.exec(sel('.tid_majorLinks a[href*="user/"]', popup).getAttribute('href'))[0];
 		var woman = sel('[src$="icons/female.png"]', popup);
-		var link = addNewEl('a', minorLinks, null, TXT.popup + (woman ? TXT.popupFemale : TXT.popupMale), { href: '#', onclick: 'return false;' });
+		var man = sel('[src$="icons/male.png"]', popup);
+		var link = addNewEl('a', minorLinks, null, TXT.popup + sel('.tid_avatarImg', popup).getAttribute('alt'), { href: '#', onclick: 'return false;' });
 		link.addEventListener('click', function() {
 			link.innerHTML += " <img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />";
 			GM_xmlhttpRequest({
@@ -295,26 +410,26 @@ setInterval(function() {
 							var resultPopup = sel('#CDA-popup');
 							if (!resultPopup) {
 								resultPopup = addNewEl('div', document.body, 'CDA-popup');
+								resultPopup.className = 'bgtablesummar twinstyle';
 								resultPopup.style.position = 'absolute';
 								resultPopup.style.width = '500px';
 								resultPopup.style.maxHeight = '500px';
 								resultPopup.style.overflowY = 'auto';
-								resultPopup.style.padding = '20px 5px 5px 5px';
+								resultPopup.style.padding = '0';
 								resultPopup.style.zIndex = '3000';
 								resultPopup.style.left = Math.floor((window.innerWidth - 500) / 2) + 'px';
 								resultPopup.style.top = (window.scrollY + 50) + 'px';
-								resultPopup.style.backgroundColor = '#33C';
 								resultPopup.style.border = '2px #008 solid';
 								resultPopup.style.borderRadius = '5px';
 							}
 							resultPopup.innerHTML = '';
-							addNewEl('h1', resultPopup, null, TXT.popupTitle.replace('%1', popupName), { style: 'font-size: 1.3em; text-align: center;' });
+							addNewEl('h3', resultPopup, null, TXT.popupTitle.replace('%1', popupName), { style: 'font-size: 1em;' }).className = 'summar';
 							addNewEl('div', resultPopup, null, "<div class='butright'><div class='butbg'>X</div></div>", {
 								style: 'position: absolute; right: 5px; top: 5px;',
 								class: 'but',
 							}).addEventListener('click', function() { document.body.removeChild(sel('#CDA-popup')); });
 							
-							analyseProfiles(me, them, resultPopup, id, popupName, woman);
+							analyseProfiles(me, them, resultPopup, id, popupName, woman, man);
 							document.body.removeChild(me);
 							document.body.removeChild(them);
 							popup.parentNode.removeChild(popup);
