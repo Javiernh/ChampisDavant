@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Champis d'avant
-// @version  1.2
+// @version  1.2.1
 // @match    http://mush.vg/*
 // @match    http://mush.twinoid.com/*
 // @match    http://mush.twinoid.es/*
@@ -85,6 +85,7 @@ else if (document.domain == 'mush.twinoid.es') {
 		youPlayed: "Tú jugaste…",
 		hePlayed: "Él jugó…",
 		shePlayed: "Ella jugó…",
+		theyPlayed: "Él/Ella jugó…",
 		days: "Días",
 		ship: "Nave",
 		shipLink: "Fama",
