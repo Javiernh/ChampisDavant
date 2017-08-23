@@ -80,25 +80,24 @@ if (document.domain == 'mush.vg') {
 else if (document.domain == 'mush.twinoid.es') {
 	lang = 'es';
 	TXT = {
-		shipsTogether: "Mushes Reunited: Ships together",
-		analysis: "Start analysis",
-		youPlayed: "You played…",
-		hePlayed: "He played…",
-		shePlayed: "She played…",
-		theyPlayed: "They played…",
-		days: "Days",
-		ship: "Ship",
-		shipLink: "Honours List",
-		resultsNumberSingular: "You played %1 ship together.",
-		resultsNumberPlural: "You played %1 ships together.",
+		shipsTogether: "Mushes Reunidos: Naves juntos",
+		analysis: "Comenzar análisis",
+		youPlayed: "Tú jugaste…",
+		hePlayed: "Él jugó…",
+		shePlayed: "Ella jugó…",
+		days: "Días",
+		ship: "Nave",
+		shipLink: "Fama",
+		resultsNumberSingular: "Ambos jugasteis %1 nave juntos.",
+		resultsNumberPlural: "Ambos jugasteis %1 naves juntos.",
 
-		peopleMet: "Mushes Reunited: People met ingame",
-		pseudo: "Pseudo",
-		shipsNumber: "Ships",
-		noFriend: "No data available. Go on someone's Mush profile and start a mutual ships analysis.",
+		peopleMet: "Mushes Reunidos: Gente encontrada en el juego",
+		pseudo: "Nick",
+		shipsNumber: "Naves",
+		noFriend: "Sin datos disponibles. Entra en el perfil de Mush de alguien y comienza el análisis.",
 
-		popup: "Mushes Reunited : ships with ",
-		popupTitle: "Games played with %1",
+		popup: "Mushes Reunidos : naves con ",
+		popupTitle: "Partidas jugadas con %1",
 	}
 }
 else {
@@ -236,7 +235,7 @@ function updateFriend(img, friendId) {
 				default:
 					name = /(\S+)'s Profile/.exec(name)[1];
 			}
-			
+
 			var trShipsB = selAll('.cdTripEntry', them); //Their ships
 			var trShipsA = selAll('.cdTripEntry', sel('#cdTrips')); //Our ships
 			var corrs = 0;
@@ -428,7 +427,7 @@ setInterval(function() {
 								style: 'position: absolute; right: 5px; top: 5px;',
 								class: 'but',
 							}).addEventListener('click', function() { document.body.removeChild(sel('#CDA-popup')); });
-							
+
 							analyseProfiles(me, them, resultPopup, id, popupName, woman, man);
 							document.body.removeChild(me);
 							document.body.removeChild(them);
