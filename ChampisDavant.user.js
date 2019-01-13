@@ -277,7 +277,7 @@ function doOwnProfile() {
 	var tr;
 	var newLine = true;
 	var friends = localStorage['ChampisDavant-friends-' + lang];
-	if (friends == undefined) {
+	if (friends == undefined || friends === '') {
 		friends = '';
 		addNewEl('tr', table, null, '<td colspan="4">' + TXT.noFriend + '</td>');
 		return;
